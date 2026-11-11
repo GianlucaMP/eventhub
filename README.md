@@ -82,18 +82,38 @@ La prueba cubre el catálogo ordenado, los campos públicos, CORS y preflight, e
 
 ## Desplegar en Vercel durante el taller
 
-Importá el mismo repositorio en dos proyectos y seleccioná Node.js 22 o 24 para ambos.
+1. Publicá el repositorio Git de `eventhub-app` en GitHub, GitLab o Bitbucket. Desde la raíz del repo, agregá la URL real como remoto y subí `main`.
 
-| Proyecto | Root Directory | Preset | Variables |
-| --- | --- | --- | --- |
-| API | `backend` | Express, detección automática de `app.js` | `DATABASE_URL` y `CORS_ORIGIN=https://tu-frontend.vercel.app` |
-| Web | `frontend` | Vite, build `npm run build`, salida `dist` | `VITE_API_URL=https://tu-api.vercel.app` |
+   ```bash
+   git remote add origin URL_DEL_REPOSITORIO
+   git push -u origin main
+   ```
 
-1. Aplicá la migración y el seed en Supabase. Creá ambos proyectos para conocer sus dominios. Configurá el origen exacto del frontend en la API, sin barra final. En previews, usá el origen de ese frontend para el entorno que corresponda.
-2. Desplegá primero la API y abrí `https://tu-api.vercel.app/api/eventos`. Comprobá el `200`, el catálogo y los cupos.
-3. Desplegá el frontend con la URL pública de la API. Abrí el tablero y comprobá en Network que el GET y el POST al otro dominio funcionan desde ese origen. Repetí la prueba de inscripción y recarga con datos ficticios.
+2. Aplicá la migración y el seed en Supabase según la sección [Preparar la base](#preparar-la-base). Usá la URL del **Transaction pooler** para `DATABASE_URL` en Vercel.
+3. Importá el mismo repo dos veces en Vercel. Elegí las raíces de la tabla y reservá los nombres de ambos proyectos para conocer sus dominios de producción. Seleccioná Node.js 22 o 24 en ambos.
 
-Vercel detecta el export por defecto de Express. `local.js` inicia el servidor durante el desarrollo. [Express en Vercel](https://vercel.com/docs/frameworks/backend/express) · [Vite en Vercel](https://vercel.com/docs/frameworks/frontend/vite)
+   | Proyecto | Root Directory | Framework | Variables de producción |
+   | --- | --- | --- | --- |
+   | API | `backend` | Express. Vercel detecta el export por defecto de `app.js`. | `DATABASE_URL` y `CORS_ORIGIN=https://tu-frontend.vercel.app` |
+   | Web | `frontend` | Vite. `vercel.json` fija el build y la salida `dist`. | `VITE_API_URL=https://tu-api.vercel.app` |
+
+4. Desplegá la API y verificá el catálogo con los dominios reales. `CORS_ORIGIN` debe coincidir exactamente con el origen del frontend, con esquema y sin barra final.
+
+   ```bash
+   API_URL=https://tu-api.vercel.app
+   WEB_ORIGIN=https://tu-frontend.vercel.app
+
+   curl -i "$API_URL/api/eventos" -H "Origin: $WEB_ORIGIN"
+   curl -i -X OPTIONS "$API_URL/api/eventos/2/inscripciones" \
+     -H "Origin: $WEB_ORIGIN" \
+     -H 'Access-Control-Request-Method: POST' \
+     -H 'Access-Control-Request-Headers: Content-Type'
+   ```
+
+   El GET debe devolver `200` y el preflight `204`. Ambas respuestas deben incluir `Access-Control-Allow-Origin` con el dominio web.
+5. Desplegá el frontend con la URL de la API cargada en `VITE_API_URL`. Abrí el tablero, inscribite con datos ficticios en **APIs con Node.js** y comprobá en Network que el POST devuelve `201`. Recargá para verificar el cupo. Reservá **Introducción a React** para el cierre.
+
+Si cambiás una variable de producción, volvé a desplegar el proyecto correspondiente. Vite incorpora `VITE_API_URL` al compilar. Guardá la conexión de Supabase únicamente en el proyecto de la API. [Monorepos en Vercel](https://vercel.com/docs/monorepos) · [Express en Vercel](https://vercel.com/docs/frameworks/backend/express) · [Vite en Vercel](https://vercel.com/docs/frameworks/frontend/vite)
 
 ## Estado de verificación
 
