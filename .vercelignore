@@ -1,0 +1,6 @@
+.eventhub-local
+node_modules
+.env
+.env.*
+!.env.example
+.vercel
