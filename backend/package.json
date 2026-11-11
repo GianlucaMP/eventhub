@@ -1,0 +1,17 @@
+{
+  "name": "eventhub-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": "^22.12.0 || ^24.0.0" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env local.js",
+    "dev": "node --watch --env-file-if-exists=.env local.js",
+    "test": "node --env-file-if-exists=.env --test"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.2.0",
+    "pg": "^8.16.0"
+  }
+}
